@@ -668,6 +668,8 @@ function initMarquees() {
 
     const cs = getComputedStyle(track);
     const dur = parseFloat(cs.animationDuration) || 88;
+    // Strategic Capabilities scrolls leftward (the rest scroll right).
+    const reverse = wrap.classList.contains('lt-marquee--alt');
     track.style.animation = 'none';
     track.style.willChange = 'transform';
 
@@ -695,7 +697,7 @@ function initMarquees() {
       const dt = (now - lastT) / 1000;
       lastT = now;
       if (!dragging && now >= resumeAt) {
-        offset += (halfWidth() / dur) * dt;
+        offset += (halfWidth() / dur) * dt * (reverse ? -1 : 1);
         wrapOffset();
       }
       track.style.transform = `translate3d(${offset}px, 0, 0)`;

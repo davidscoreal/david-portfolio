@@ -491,6 +491,7 @@
       track.dataset.dragInit = "1";
       const cs = getComputedStyle(track);
       const dur = parseFloat(cs.animationDuration) || 88;
+      const reverse = wrap.classList.contains("lt-marquee--alt");
       track.style.animation = "none";
       track.style.willChange = "transform";
       let halfWidth = () => track.scrollWidth / 2;
@@ -515,7 +516,7 @@
         const dt = (now - lastT) / 1e3;
         lastT = now;
         if (!dragging && now >= resumeAt) {
-          offset += halfWidth() / dur * dt;
+          offset += halfWidth() / dur * dt * (reverse ? -1 : 1);
           wrapOffset();
         }
         track.style.transform = `translate3d(${offset}px, 0, 0)`;

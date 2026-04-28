@@ -239,8 +239,9 @@ a { color: inherit; text-decoration: none; }
 /* Pause hover only when JS drag isn't in charge (data-drag-init is set by JS) */
 .lt-marquee-track[data-drag-init] { animation: none; }
 
-/* Per-marquee desync — strips speed up as you scroll down (88 → 55s). */
-.lt-marquee--alt .lt-marquee-track { animation-duration: 77s; }
+/* Per-marquee desync — strips speed up as you scroll down. The --alt
+   strip (Strategic Capabilities) runs noticeably faster and in reverse. */
+.lt-marquee--alt .lt-marquee-track { animation-duration: 22s; }
 .lt-marquee--c   .lt-marquee-track { animation-duration: 66s; }
 .lt-marquee--d   .lt-marquee-track { animation-duration: 55s; }
 
