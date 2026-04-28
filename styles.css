@@ -426,10 +426,14 @@ a { color: inherit; text-decoration: none; }
   position: relative;
   width: 100vw;
   margin-left: calc(50% - 50vw);
-  min-height: 380px;
-  padding: 28px 22px 28px 22px;
+  /* Fixed height — accommodates the longest service so changing copy
+     never shifts what's below (Communities, CTA, etc.) */
+  height: 460px;
+  padding: 28px 22px;
   overflow: hidden;
   isolation: isolate;
+  display: flex;
+  align-items: center;
 }
 
 .lt-pricing-content {
@@ -473,19 +477,18 @@ a { color: inherit; text-decoration: none; }
   margin: 0;
 }
 
-/* The thump animation re-runs each time React remounts the content via key={idx} */
-.lt-pricing--locked .lt-pricing-content {
-  animation: lt-pricing-thump 320ms cubic-bezier(0.36, 0.07, 0.19, 0.97);
-}
-.lt-pricing--dragging .lt-pricing-content {
-  opacity: 0.85;
-  transition: opacity 120ms ease;
+/* The thump animation re-runs each time React remounts the content via
+   key={idx} — that means every time the dial crosses a major tick, even
+   mid-drag. The keyframe scales up briefly and settles for a tactile pop. */
+.lt-pricing-content {
+  animation: lt-pricing-thump 300ms cubic-bezier(0.34, 1.48, 0.64, 1);
+  transform-origin: left center;
+  will-change: transform;
 }
 @keyframes lt-pricing-thump {
-  0%   { transform: translateX(2.5px); opacity: 0.45; }
-  35%  { transform: translateX(-1.5px); opacity: 0.92; }
-  70%  { transform: translateX(0.5px); opacity: 1; }
-  100% { transform: translateX(0); opacity: 1; }
+  0%   { transform: scale(0.93); }
+  45%  { transform: scale(1.07); }
+  100% { transform: scale(1); }
 }
 
 /* Half-moon: a square dial pushed past the right edge so only the left
@@ -533,9 +536,15 @@ a { color: inherit; text-decoration: none; }
   pointer-events: none;
   z-index: 3;
   animation: lt-pricing-pulse 1.6s ease-in-out infinite;
-  filter: drop-shadow(0 0 6px rgba(120, 255, 180, 0.6));
+  /* Layered drop-shadows — render the glow as a true gas halo that bleeds
+     past the SVG bounds, not clipped to a rectangle. */
+  filter:
+    drop-shadow(0 0 6px rgba(80, 255, 140, 0.85))
+    drop-shadow(0 0 14px rgba(80, 255, 140, 0.55))
+    drop-shadow(0 0 28px rgba(80, 255, 140, 0.30));
+  overflow: visible;
 }
-.lt-pricing-hint svg { width: 100%; height: 100%; display: block; }
+.lt-pricing-hint svg { width: 100%; height: 100%; display: block; overflow: visible; }
 @keyframes lt-pricing-pulse {
   0%, 100% { opacity: 0.32; }
   50%      { opacity: 1; }

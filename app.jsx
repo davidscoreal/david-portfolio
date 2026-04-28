@@ -313,34 +313,56 @@ function PricingDial() {
             user touches it. Independent layer so the dial can rotate underneath. */}
         {!hasInteracted && (
           <div className="lt-pricing-hint" aria-hidden="true">
-            <svg viewBox="-100 -100 200 200" preserveAspectRatio="xMidYMid meet">
+            <svg viewBox="-130 -130 260 260" preserveAspectRatio="xMidYMid meet" overflow="visible">
               <defs>
-                <filter id="lt-hint-glow" x="-50%" y="-50%" width="200%" height="200%">
-                  <feGaussianBlur stdDeviation="3.2" />
+                {/* Wide filter region so the gas halo isn't clipped at element
+                    bounds — it bleeds outward following each stroke's shape. */}
+                <filter id="lt-hint-glow" x="-200%" y="-200%" width="500%" height="500%">
+                  <feGaussianBlur stdDeviation="6" />
+                </filter>
+                <filter id="lt-hint-glow-tight" x="-100%" y="-100%" width="300%" height="300%">
+                  <feGaussianBlur stdDeviation="2" />
                 </filter>
               </defs>
-              {/* Two arcs on the visible left rim — one upper, one lower —
-                  each ending in a small chevron marker hinting drag direction */}
+              {/* Outer diffuse halo */}
               <path
                 d="M -94 -28 A 98 98 0 0 0 -94 28"
                 fill="none"
-                stroke="rgba(140,255,180,0.55)"
-                strokeWidth="3.5"
+                stroke="rgb(60, 255, 130)"
+                strokeWidth="5"
                 strokeLinecap="round"
+                opacity="0.85"
                 filter="url(#lt-hint-glow)" />
+              {/* Mid glow */}
               <path
                 d="M -94 -28 A 98 98 0 0 0 -94 28"
                 fill="none"
-                stroke="rgba(220,255,235,0.95)"
-                strokeWidth="1.1"
+                stroke="rgb(120, 255, 170)"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                filter="url(#lt-hint-glow-tight)" />
+              {/* Bright neon core */}
+              <path
+                d="M -94 -28 A 98 98 0 0 0 -94 28"
+                fill="none"
+                stroke="rgb(235, 255, 240)"
+                strokeWidth="1"
                 strokeLinecap="round" />
-              {/* up chevron */}
+              {/* Up chevron — outer halo */}
               <path d="M -88 -38 L -82 -45 L -76 -38"
-                fill="none" stroke="rgba(220,255,235,0.95)" strokeWidth="1.4"
+                fill="none" stroke="rgb(60, 255, 130)" strokeWidth="3.5"
+                strokeLinecap="round" strokeLinejoin="round"
+                opacity="0.85" filter="url(#lt-hint-glow)" />
+              <path d="M -88 -38 L -82 -45 L -76 -38"
+                fill="none" stroke="rgb(235, 255, 240)" strokeWidth="1.2"
                 strokeLinecap="round" strokeLinejoin="round" />
-              {/* down chevron */}
+              {/* Down chevron — outer halo */}
               <path d="M -88 38 L -82 45 L -76 38"
-                fill="none" stroke="rgba(220,255,235,0.95)" strokeWidth="1.4"
+                fill="none" stroke="rgb(60, 255, 130)" strokeWidth="3.5"
+                strokeLinecap="round" strokeLinejoin="round"
+                opacity="0.85" filter="url(#lt-hint-glow)" />
+              <path d="M -88 38 L -82 45 L -76 38"
+                fill="none" stroke="rgb(235, 255, 240)" strokeWidth="1.2"
                 strokeLinecap="round" strokeLinejoin="round" />
             </svg>
           </div>
