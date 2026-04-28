@@ -126,10 +126,13 @@
     React.useEffect(() => {
       if (open) {
         setMounted(true);
-        const r = requestAnimationFrame(() => setVisible(true));
         document.body.style.overflow = "hidden";
+        // Defer enough that the browser commits the initial translateY(100%)
+        // paint before we flip to visible (otherwise React batches and the
+        // slide-up animation is skipped).
+        const t = setTimeout(() => setVisible(true), 24);
         return () => {
-          cancelAnimationFrame(r);
+          clearTimeout(t);
           document.body.style.overflow = "";
         };
       } else {
@@ -139,10 +142,16 @@
           setStatus("idle");
           setErrors({});
           setDragY(0);
-        }, 360);
+        }, 460);
         return () => clearTimeout(t);
       }
     }, [open]);
+    React.useEffect(() => {
+      if (status === "success") {
+        const t = setTimeout(() => onClose(), 2400);
+        return () => clearTimeout(t);
+      }
+    }, [status, onClose]);
     if (!mounted) return null;
     const validate = () => {
       const e = {};
@@ -240,8 +249,8 @@
         status === "success"
           ? /* @__PURE__ */ React.createElement("div", { className: "lt-sheet-success" },
               /* @__PURE__ */ React.createElement("div", { className: "lt-sheet-success-icon" }, "✓"),
-              /* @__PURE__ */ React.createElement("h3", null, "\xA1Listo!"),
-              /* @__PURE__ */ React.createElement("p", null, "Te contacto en menos de 24h."),
+              /* @__PURE__ */ React.createElement("h3", null, "\xA1Gracias!"),
+              /* @__PURE__ */ React.createElement("p", null, "Te contacto en menos de 24h. Sigue explorando."),
               /* @__PURE__ */ React.createElement("button", { type: "button", className: "lt-sheet-close-btn", onClick: onClose }, "Cerrar")
             )
           : /* @__PURE__ */ React.createElement("form", { className: "lt-sheet-form", onSubmit: submit, noValidate: true },
