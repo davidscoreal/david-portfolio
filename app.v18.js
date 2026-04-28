@@ -356,49 +356,61 @@
         }
       }
     }, [idx]);
+    // Drag with WINDOW listeners (no setPointerCapture — that fails silently
+    // on iOS Safari). Every move event lands on window, so the dial keeps
+    // tracking the finger anywhere on screen until pointerup.
+    React.useEffect(() => {
+      if (!dragging) return;
+      const onWinMove = (ev) => {
+        if (!dragRef.current) return;
+        const cx = ev.clientX !== undefined ? ev.clientX : (ev.touches && ev.touches[0] && ev.touches[0].clientX);
+        if (cx === undefined) return;
+        const dx = cx - dragRef.current.startX;
+        setAngle(dragRef.current.startAngle - dx * (stepDeg / 64));
+        if (ev.cancelable) ev.preventDefault();
+      };
+      const onWinUp = () => {
+        setAngle((a) => Math.round(a / stepDeg) * stepDeg);
+        setDragging(false);
+        dragRef.current = null;
+        if (typeof navigator !== "undefined" && navigator.vibrate) {
+          try { navigator.vibrate(45); } catch (_) {}
+        }
+      };
+      window.addEventListener("pointermove", onWinMove, { passive: false });
+      window.addEventListener("pointerup", onWinUp);
+      window.addEventListener("pointercancel", onWinUp);
+      window.addEventListener("touchmove", onWinMove, { passive: false });
+      window.addEventListener("touchend", onWinUp);
+      window.addEventListener("touchcancel", onWinUp);
+      return () => {
+        window.removeEventListener("pointermove", onWinMove);
+        window.removeEventListener("pointerup", onWinUp);
+        window.removeEventListener("pointercancel", onWinUp);
+        window.removeEventListener("touchmove", onWinMove);
+        window.removeEventListener("touchend", onWinUp);
+        window.removeEventListener("touchcancel", onWinUp);
+      };
+    }, [dragging, stepDeg]);
     const onDown = (e) => {
-      // Block desktop mouse/stylus. Touch (and any device that doesn't
-      // identify its pointerType) is allowed through.
       if (e.pointerType === "mouse" || e.pointerType === "pen") return;
       const wrap = wrapRef.current;
       if (!wrap) return;
       const rect = wrap.getBoundingClientRect();
       const cx = rect.left + rect.width / 2;
       const cy = rect.top + rect.height / 2;
-      const dx = e.clientX - cx;
-      const dy = e.clientY - cy;
+      const px = e.clientX !== undefined ? e.clientX : (e.touches && e.touches[0] && e.touches[0].clientX);
+      const py = e.clientY !== undefined ? e.clientY : (e.touches && e.touches[0] && e.touches[0].clientY);
+      if (px === undefined || py === undefined) return;
+      const dx = px - cx;
+      const dy = py - cy;
       const dist = Math.hypot(dx, dy);
       const rOuter = rect.width / 2;
       const rInner = rOuter * 0.74;
       if (dist < rInner || dist > rOuter * 1.02) return;
+      dragRef.current = { startX: px, startAngle: angle };
       setDragging(true);
-      dragRef.current = { startX: e.clientX, startAngle: angle };
-      if (e.pointerId !== void 0 && wrap.setPointerCapture) {
-        try {
-          wrap.setPointerCapture(e.pointerId);
-        } catch (_) {
-        }
-      }
-    };
-    const onMove = (e) => {
-      if (!dragging || !dragRef.current) return;
-      const dx = e.clientX - dragRef.current.startX;
-      const next = dragRef.current.startAngle - dx * (stepDeg / 64);
-      setAngle(next);
       if (e.cancelable) e.preventDefault();
-    };
-    const onUp = () => {
-      if (!dragging) return;
-      setDragging(false);
-      dragRef.current = null;
-      const snapped = Math.round(angle / stepDeg) * stepDeg;
-      setAngle(snapped);
-      if (typeof navigator !== "undefined" && navigator.vibrate) {
-        try {
-          navigator.vibrate(45);
-        } catch (_) {
-        }
-      }
     };
     const s = PRICING_SERVICES[idx];
     return /* @__PURE__ */ React.createElement("div", { className: "lt-pricing " + (dragging ? "lt-pricing--dragging" : "lt-pricing--locked") }, /* @__PURE__ */ React.createElement("div", { className: "lt-pricing-content", key: idx }, /* @__PURE__ */ React.createElement("h3", { className: "lt-pricing-title" }, s.title), /* @__PURE__ */ React.createElement("div", { className: "lt-pricing-price" }, s.price), /* @__PURE__ */ React.createElement("p", { className: "lt-pricing-desc" }, s.desc)), /* @__PURE__ */ React.createElement(
@@ -407,9 +419,7 @@
         className: "lt-pricing-dial-wrap",
         ref: wrapRef,
         onPointerDown: onDown,
-        onPointerMove: onMove,
-        onPointerUp: onUp,
-        onPointerCancel: onUp,
+        onTouchStart: onDown,
         "aria-hidden": "true"
       },
       /* @__PURE__ */ React.createElement(
