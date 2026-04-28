@@ -824,7 +824,7 @@
             activeItem = null;
           }
           releaseTimer = null;
-        }, 30);
+        }, 7000);
         if (pointerId !== null) {
           try {
             wrap.releasePointerCapture(pointerId);
