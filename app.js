@@ -41,7 +41,6 @@
     "assets/mission/03-misiones.png",
     "assets/mission/04-celulas.png",
     "assets/mission/05-taller.png",
-    "assets/mission/06-finanzas.png",
     "assets/mission/07-nuevo-proyecto.png",
     "assets/mission/00-original.png"
   ];

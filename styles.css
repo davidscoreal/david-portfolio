@@ -369,7 +369,11 @@ a { color: inherit; text-decoration: none; }
   background-position: center;
   opacity: 0;
   pointer-events: none;
-  animation: lt-mission-step 20s linear infinite;
+  animation: lt-mission-step 17.5s linear infinite;
+  /* Uniform crop for all frames — pulls 5% in from every edge so Chrome
+     bars at top and window padding at sides are clipped consistently. */
+  transform: scale(1.10);
+  transform-origin: center center;
 }
 .lt-mission-frame:nth-child(1) { animation-delay: 0s; }
 .lt-mission-frame:nth-child(2) { animation-delay: 2.5s; }
@@ -378,36 +382,12 @@ a { color: inherit; text-decoration: none; }
 .lt-mission-frame:nth-child(5) { animation-delay: 10s; }
 .lt-mission-frame:nth-child(6) { animation-delay: 12.5s; }
 .lt-mission-frame:nth-child(7) { animation-delay: 15s; }
-.lt-mission-frame:nth-child(8) { animation-delay: 17.5s; }
-
-/* Per-frame crops to hide Chrome bars / window borders. Parent has
-   overflow:hidden, so scale-up anchored to the clean edge clips the noise. */
-.lt-mission-frame:nth-child(1),
-.lt-mission-frame:nth-child(2),
-.lt-mission-frame:nth-child(3),
-.lt-mission-frame:nth-child(5),
-.lt-mission-frame:nth-child(7) {
-  /* single Chrome address bar at top */
-  transform: scale(1.06);
-  transform-origin: center bottom;
-}
-.lt-mission-frame:nth-child(4),
-.lt-mission-frame:nth-child(6) {
-  /* Chrome bar on top + window/page padding on sides */
-  transform: scale(1.10);
-  transform-origin: center center;
-}
-.lt-mission-frame:nth-child(8) {
-  /* Chrome tabs row + URL bar — taller crop */
-  transform: scale(1.09);
-  transform-origin: center bottom;
-}
 
 @keyframes lt-mission-step {
-  0%   { opacity: 1; }
-  12%  { opacity: 1; }
-  12.5%{ opacity: 0; }
-  100% { opacity: 0; }
+  0%    { opacity: 1; }
+  13.7% { opacity: 1; }
+  14.3% { opacity: 0; }
+  100%  { opacity: 0; }
 }
 
 .lt-marquee-tag {
