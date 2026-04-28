@@ -645,10 +645,16 @@ function initMarquees() {
     let startX = 0;
     let startY = 0;
     let startOffset = 0;
-    let resumeAt = 0;
     let moved = false;
     let activeItem = null;
     let releaseTimer = null;
+    // Velocity tracking for inertia after release.
+    let lastMoveX = 0;
+    let lastMoveT = 0;
+    let dragVelocity = 0;        // px/s, smoothed
+    let releaseVelocity = 0;     // px/s captured at the moment of pointerup
+    let releaseTime = 0;         // performance.now() of pointerup; 0 = no settle in progress
+    const SETTLE_MS = 5000;      // how long to ease from flick velocity → base
     const MOVE_THRESHOLD = 8;
 
     const wrapOffset = () => {
@@ -660,8 +666,25 @@ function initMarquees() {
     const tick = (now) => {
       const dt = (now - lastT) / 1000;
       lastT = now;
-      if (!dragging && now >= resumeAt) {
-        offset += (halfWidth() / dur) * dt * (reverse ? -1 : 1);
+      if (!dragging) {
+        const baseVel = (halfWidth() / dur) * (reverse ? -1 : 1);
+        let velocity;
+        if (releaseTime > 0) {
+          // Ease the flick velocity back to baseVel over SETTLE_MS.
+          const elapsed = now - releaseTime;
+          if (elapsed < SETTLE_MS) {
+            const k = elapsed / SETTLE_MS;
+            const eased = 1 - Math.pow(1 - k, 3); // ease-out cubic
+            velocity = releaseVelocity * (1 - eased) + baseVel * eased;
+          } else {
+            velocity = baseVel;
+            releaseTime = 0;
+            releaseVelocity = 0;
+          }
+        } else {
+          velocity = baseVel;
+        }
+        offset += velocity * dt;
         wrapOffset();
       }
       track.style.transform = `translate3d(${offset}px, 0, 0)`;
@@ -688,6 +711,10 @@ function initMarquees() {
       startX = getX(e);
       startY = getY(e);
       startOffset = offset;
+      lastMoveX = startX;
+      lastMoveT = e.timeStamp || performance.now();
+      dragVelocity = 0;
+      releaseTime = 0; // cancel any in-flight settle
       if (releaseTimer) { clearTimeout(releaseTimer); releaseTimer = null; }
       setActive(findItemAt(startX, startY));
       if (e.pointerId !== undefined) {
@@ -698,18 +725,28 @@ function initMarquees() {
     const onMove = (e) => {
       if (!dragging) return;
       const x = getX(e);
+      const t = e.timeStamp || performance.now();
       const dx = x - startX;
       if (Math.abs(dx) > MOVE_THRESHOLD) moved = true;
       offset = startOffset + dx;
       wrapOffset();
+      // Track instantaneous velocity (low-pass smoothed).
+      const moveDt = (t - lastMoveT) / 1000;
+      if (moveDt > 0) {
+        const v = (x - lastMoveX) / moveDt;
+        dragVelocity = dragVelocity * 0.4 + v * 0.6;
+      }
+      lastMoveX = x;
+      lastMoveT = t;
       setActive(findItemAt(x, getY(e)));
       if (moved && e.cancelable) e.preventDefault();
     };
     const onUp = () => {
       if (!dragging) return;
       dragging = false;
-      resumeAt = performance.now() + 800;
-      // Hold the label visible for 30ms after release, then let CSS fade.
+      // Capture flick velocity for the inertia easing in tick().
+      releaseVelocity = dragVelocity;
+      releaseTime = performance.now();
       const itemAtRelease = activeItem;
       releaseTimer = setTimeout(() => {
         if (activeItem === itemAtRelease) {

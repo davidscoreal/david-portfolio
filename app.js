@@ -460,10 +460,15 @@
       let startX = 0;
       let startY = 0;
       let startOffset = 0;
-      let resumeAt = 0;
       let moved = false;
       let activeItem = null;
       let releaseTimer = null;
+      let lastMoveX = 0;
+      let lastMoveT = 0;
+      let dragVelocity = 0;
+      let releaseVelocity = 0;
+      let releaseTime = 0;
+      const SETTLE_MS = 5e3;
       const MOVE_THRESHOLD = 8;
       const wrapOffset = () => {
         const hw = halfWidth();
@@ -473,8 +478,24 @@
       const tick = (now) => {
         const dt = (now - lastT) / 1e3;
         lastT = now;
-        if (!dragging && now >= resumeAt) {
-          offset += halfWidth() / dur * dt * (reverse ? -1 : 1);
+        if (!dragging) {
+          const baseVel = halfWidth() / dur * (reverse ? -1 : 1);
+          let velocity;
+          if (releaseTime > 0) {
+            const elapsed = now - releaseTime;
+            if (elapsed < SETTLE_MS) {
+              const k = elapsed / SETTLE_MS;
+              const eased = 1 - Math.pow(1 - k, 3);
+              velocity = releaseVelocity * (1 - eased) + baseVel * eased;
+            } else {
+              velocity = baseVel;
+              releaseTime = 0;
+              releaseVelocity = 0;
+            }
+          } else {
+            velocity = baseVel;
+          }
+          offset += velocity * dt;
           wrapOffset();
         }
         track.style.transform = `translate3d(${offset}px, 0, 0)`;
@@ -502,6 +523,10 @@
         startX = getX(e);
         startY = getY(e);
         startOffset = offset;
+        lastMoveX = startX;
+        lastMoveT = e.timeStamp || performance.now();
+        dragVelocity = 0;
+        releaseTime = 0;
         if (releaseTimer) {
           clearTimeout(releaseTimer);
           releaseTimer = null;
@@ -518,17 +543,26 @@
       const onMove = (e) => {
         if (!dragging) return;
         const x = getX(e);
+        const t = e.timeStamp || performance.now();
         const dx = x - startX;
         if (Math.abs(dx) > MOVE_THRESHOLD) moved = true;
         offset = startOffset + dx;
         wrapOffset();
+        const moveDt = (t - lastMoveT) / 1e3;
+        if (moveDt > 0) {
+          const v = (x - lastMoveX) / moveDt;
+          dragVelocity = dragVelocity * 0.4 + v * 0.6;
+        }
+        lastMoveX = x;
+        lastMoveT = t;
         setActive(findItemAt(x, getY(e)));
         if (moved && e.cancelable) e.preventDefault();
       };
       const onUp = () => {
         if (!dragging) return;
         dragging = false;
-        resumeAt = performance.now() + 800;
+        releaseVelocity = dragVelocity;
+        releaseTime = performance.now();
         const itemAtRelease = activeItem;
         releaseTimer = setTimeout(() => {
           if (activeItem === itemAtRelease) {
