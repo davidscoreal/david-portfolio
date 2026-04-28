@@ -539,14 +539,12 @@ a { color: inherit; text-decoration: none; }
   max-width: 380px;
   aspect-ratio: 1;
   z-index: 1;
-  /* Page can still scroll vertically through the page; the dial captures
-     vertical drag only when the press lands on the outer ring (JS hit-test).
-     We need pointer-events ON so handlers fire. */
+  /* The dial owns every gesture inside its area: when a finger lands on
+     the half-moon, page scroll is suppressed and the touch is delivered
+     to the JS handler, which spins the wheel. To scroll the page, the
+     user starts the gesture from the text column on the left. */
   pointer-events: auto;
-  /* Allow vertical page-scroll to pass through the dial — the JS hit-test
-     still catches drags that start on the rim, but the user can scroll
-     past the dial without the page sticking. */
-  touch-action: pan-y;
+  touch-action: none;
   filter:
     drop-shadow(0 14px 24px rgba(0, 0, 0, 0.7))
     drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
