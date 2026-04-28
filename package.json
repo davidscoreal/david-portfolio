@@ -1,0 +1,14 @@
+{
+  "name": "david-portfolio",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Mobile-only portfolio — David Steban López",
+  "scripts": {
+    "build": "esbuild app.jsx --outfile=app.js --loader:.jsx=jsx --target=es2020 --format=iife --jsx=transform",
+    "watch": "esbuild app.jsx --outfile=app.js --loader:.jsx=jsx --target=es2020 --format=iife --jsx=transform --watch",
+    "serve": "python3 -m http.server 5273"
+  },
+  "devDependencies": {
+    "esbuild": "^0.25.0"
+  }
+}
