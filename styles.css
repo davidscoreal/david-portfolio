@@ -296,6 +296,12 @@ a { color: inherit; text-decoration: none; }
   opacity: 1;
 }
 
+/* Hold the slide static while the user keeps a finger on it — pause the
+   internal frame carousel so they can read what's on screen. */
+.lt-marquee-item--active .lt-mission-frame {
+  animation-play-state: paused;
+}
+
 .lt-marquee-label {
   font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
   font-weight: 200;

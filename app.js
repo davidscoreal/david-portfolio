@@ -357,6 +357,8 @@
       }
     }, [idx]);
     const onDown = (e) => {
+      // Touch only — no mouse, no stylus. The dial is for mobile.
+      if (e.pointerType && e.pointerType !== "touch") return;
       const wrap = wrapRef.current;
       if (!wrap) return;
       const rect = wrap.getBoundingClientRect();
@@ -369,7 +371,10 @@
       const rInner = rOuter * 0.74;
       if (dist < rInner || dist > rOuter * 1.02) return;
       setDragging(true);
-      dragRef.current = { startX: e.clientX, startAngle: angle };
+      // Angular drag: record the touch's angle relative to the dial center,
+      // and rotate the dial by however many degrees the finger sweeps around.
+      const startTouchAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+      dragRef.current = { startTouchAngle, startAngle: angle };
       if (e.pointerId !== void 0 && wrap.setPointerCapture) {
         try {
           wrap.setPointerCapture(e.pointerId);
@@ -379,9 +384,19 @@
     };
     const onMove = (e) => {
       if (!dragging || !dragRef.current) return;
-      const dx = e.clientX - dragRef.current.startX;
-      const next = dragRef.current.startAngle - dx * (stepDeg / 64);
-      setAngle(next);
+      const wrap = wrapRef.current;
+      if (!wrap) return;
+      const rect = wrap.getBoundingClientRect();
+      const cx = rect.left + rect.width / 2;
+      const cy = rect.top + rect.height / 2;
+      const dx = e.clientX - cx;
+      const dy = e.clientY - cy;
+      const currentTouchAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+      let delta = currentTouchAngle - dragRef.current.startTouchAngle;
+      // Unwrap so successive swipes accumulate naturally
+      while (delta > 180) delta -= 360;
+      while (delta < -180) delta += 360;
+      setAngle(dragRef.current.startAngle + delta);
       if (e.cancelable) e.preventDefault();
     };
     const onUp = () => {
@@ -688,7 +703,11 @@
       let dragVelocity = 0;
       let releaseVelocity = 0;
       let releaseTime = 0;
-      const SETTLE_MS = 5e3;
+      // After releasing a touch: hold the marquee static for HOLD_MS so the
+      // user can finish reading what they tapped, then ramp back to baseVel
+      // over RAMP_MS. Total dwell ≈ 7s.
+      const HOLD_MS = 5e3;
+      const RAMP_MS = 2e3;
       const MOVE_THRESHOLD = 8;
       const wrapOffset = () => {
         const hw = halfWidth();
@@ -703,10 +722,12 @@
           let velocity;
           if (releaseTime > 0) {
             const elapsed = now - releaseTime;
-            if (elapsed < SETTLE_MS) {
-              const k = elapsed / SETTLE_MS;
+            if (elapsed < HOLD_MS) {
+              velocity = 0;
+            } else if (elapsed < HOLD_MS + RAMP_MS) {
+              const k = (elapsed - HOLD_MS) / RAMP_MS;
               const eased = 1 - Math.pow(1 - k, 3);
-              velocity = releaseVelocity * (1 - eased) + baseVel * eased;
+              velocity = baseVel * eased;
             } else {
               velocity = baseVel;
               releaseTime = 0;
@@ -733,9 +754,22 @@
       };
       const setActive = (item) => {
         if (activeItem === item) return;
-        if (activeItem) activeItem.classList.remove("lt-marquee-item--active");
+        if (activeItem) {
+          activeItem.classList.remove("lt-marquee-item--active");
+          // Resume any paused video inside the previously-active slide
+          const prevVid = activeItem.querySelector("video");
+          if (prevVid && prevVid.paused) {
+            const p = prevVid.play();
+            if (p && p.catch) p.catch(() => {});
+          }
+        }
         activeItem = item;
-        if (item) item.classList.add("lt-marquee-item--active");
+        if (item) {
+          item.classList.add("lt-marquee-item--active");
+          // Pause the video so the user can read the label without motion
+          const vid = item.querySelector("video");
+          if (vid && !vid.paused) vid.pause();
+        }
       };
       const onDown = (e) => {
         dragging = true;
