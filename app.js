@@ -118,21 +118,32 @@
     const [message, setMessage] = React.useState("");
     const [status, setStatus] = React.useState("idle");
     const [errors, setErrors] = React.useState({});
+    const [mounted, setMounted] = React.useState(false);
+    const [visible, setVisible] = React.useState(false);
     const sheetRef = React.useRef(null);
     const dragRef = React.useRef(null);
     const [dragY, setDragY] = React.useState(0);
     React.useEffect(() => {
-      if (!open) {
+      if (open) {
+        setMounted(true);
+        const r = requestAnimationFrame(() => setVisible(true));
+        document.body.style.overflow = "hidden";
+        return () => {
+          cancelAnimationFrame(r);
+          document.body.style.overflow = "";
+        };
+      } else {
+        setVisible(false);
         const t = setTimeout(() => {
+          setMounted(false);
           setStatus("idle");
           setErrors({});
           setDragY(0);
-        }, 320);
+        }, 360);
         return () => clearTimeout(t);
       }
-      document.body.style.overflow = "hidden";
-      return () => { document.body.style.overflow = ""; };
     }, [open]);
+    if (!mounted) return null;
     const validate = () => {
       const e = {};
       if (!name.trim()) e.name = "Tu nombre";
@@ -201,8 +212,8 @@
     return /* @__PURE__ */ React.createElement(
       "div",
       {
-        className: "lt-sheet-root " + (open ? "lt-sheet-root--open" : ""),
-        "aria-hidden": !open
+        className: "lt-sheet-root " + (visible ? "lt-sheet-root--open" : ""),
+        "aria-hidden": !visible
       },
       /* @__PURE__ */ React.createElement("div", { className: "lt-sheet-backdrop", onClick: onClose }),
       /* @__PURE__ */ React.createElement(
