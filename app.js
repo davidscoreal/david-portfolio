@@ -337,7 +337,7 @@
       desc: "Security review of smart contracts (Solidity, Rust/Solana, Move) before mainnet deployment. Static and dynamic analysis, detection of known vulnerability patterns \u2014 reentrancy, overflow, access control flaws \u2014 attack simulation, and a severity-classified report. Includes remediation guidance and a re-audit after fixes."
     }
   ];
-  function PricingDial({ onServiceChange }) {
+  function PricingDial() {
     const stepDeg = 360 / PRICING_SERVICES.length;
     const [angle, setAngle] = React.useState(0);
     const [dragging, setDragging] = React.useState(false);
@@ -355,8 +355,7 @@
           }
         }
       }
-      if (onServiceChange) onServiceChange(PRICING_SERVICES[idx].title);
-    }, [idx, onServiceChange]);
+    }, [idx]);
     const onDown = (e) => {
       const wrap = wrapRef.current;
       if (!wrap) return;
@@ -512,7 +511,11 @@
   function App() {
     const [leadOpen, setLeadOpen] = React.useState(false);
     const [leadService, setLeadService] = React.useState(PRICING_SERVICES[0].title);
-    const openLead = () => setLeadOpen(true);
+    const openLead = () => {
+      const t = document.querySelector(".lt-pricing-title")?.textContent;
+      if (t) setLeadService(t);
+      setLeadOpen(true);
+    };
     const closeLead = () => setLeadOpen(false);
     return /* @__PURE__ */ React.createElement("main", { className: "lt" }, /* @__PURE__ */ React.createElement(LeadSheet, { open: leadOpen, service: leadService, onClose: closeLead }), /* @__PURE__ */ React.createElement("div", { className: "lt-shell" }, /* @__PURE__ */ React.createElement("header", { className: "lt-header" }, /* @__PURE__ */ React.createElement("span", { className: "lt-eyebrow" }, "GRATEFULLY \u{1F1E8}\u{1F1F4}"), /* @__PURE__ */ React.createElement("h1", { className: "lt-title" }, /* @__PURE__ */ React.createElement("img", { className: "lt-bird", src: "assets/colibri-cutout.png?v=3", alt: "", "aria-hidden": "true" }), /* @__PURE__ */ React.createElement("span", { className: "lt-row lt-row-port" }, /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "P"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "O"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "R"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "T")), /* @__PURE__ */ React.createElement("span", { className: "lt-row lt-row-folio" }, /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "F"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "O"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter lt-letter-over" }, "L"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter lt-letter-over" }, "I"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter lt-letter-over" }, "O")))), /* @__PURE__ */ React.createElement("section", { className: "lt-id-block" }, /* @__PURE__ */ React.createElement("p", { className: "lt-name" }, "David Steban R L\xF3pez"), /* @__PURE__ */ React.createElement("nav", { className: "lt-icons", "aria-label": "Links" }, LINKS.map(
       (l) => /* @__PURE__ */ React.createElement(
@@ -635,7 +638,7 @@
         preload: "auto",
         tabIndex: -1
       }
-    ), /* @__PURE__ */ React.createElement("div", { className: "lt-marquee-overlay", "aria-hidden": "true" }, /* @__PURE__ */ React.createElement("span", { className: "lt-marquee-label" }, "Blockchain Contract Auditing")))))), /* @__PURE__ */ React.createElement("section", { className: "lt-block" }, /* @__PURE__ */ React.createElement("h2", { className: "lt-section-title" }, "PRICING"), /* @__PURE__ */ React.createElement(PricingDial, { onServiceChange: setLeadService }), /* @__PURE__ */ React.createElement("button", { type: "button", className: "lt-pricing-cta-bar", onClick: openLead }, "Solicitar info →")), /* @__PURE__ */ React.createElement("section", { className: "lt-block" }, /* @__PURE__ */ React.createElement("h2", { className: "lt-section-title" }, "COMMUNITIES"), /* @__PURE__ */ React.createElement("div", { className: "lt-communities", "aria-label": "Communities" }, COMMUNITIES.map(
+    ), /* @__PURE__ */ React.createElement("div", { className: "lt-marquee-overlay", "aria-hidden": "true" }, /* @__PURE__ */ React.createElement("span", { className: "lt-marquee-label" }, "Blockchain Contract Auditing")))))), /* @__PURE__ */ React.createElement("section", { className: "lt-block" }, /* @__PURE__ */ React.createElement("h2", { className: "lt-section-title" }, "PRICING"), /* @__PURE__ */ React.createElement(PricingDial, null), /* @__PURE__ */ React.createElement("button", { type: "button", className: "lt-pricing-cta-bar", onClick: openLead }, "Solicitar info →")), /* @__PURE__ */ React.createElement("section", { className: "lt-block" }, /* @__PURE__ */ React.createElement("h2", { className: "lt-section-title" }, "COMMUNITIES"), /* @__PURE__ */ React.createElement("div", { className: "lt-communities", "aria-label": "Communities" }, COMMUNITIES.map(
       (c) => /* @__PURE__ */ React.createElement(
         "a",
         {
