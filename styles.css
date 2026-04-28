@@ -426,13 +426,15 @@ a { color: inherit; text-decoration: none; }
   width: 100vw;
   margin-left: calc(50% - 50vw);
   /* Fixed height — accommodates the longest service so changing copy
-     never shifts what's below (Communities, CTA, etc.) */
+     never shifts what's below (Communities, CTA, etc.). Anchored at
+     the top so titles always start at the same Y regardless of desc length. */
   height: 460px;
-  padding: 28px 22px;
-  overflow: hidden;
+  padding: 36px 22px 28px;
+  /* visible so the pointer's neon glow can spill outside without being clipped */
+  overflow: visible;
   isolation: isolate;
   display: flex;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .lt-pricing-content {
@@ -440,6 +442,9 @@ a { color: inherit; text-decoration: none; }
   z-index: 2;
   width: 56%;
   max-width: 240px;
+  /* Reserve the vertical space of the longest service so descriptions
+     never push siblings around — short descs leave (invisible) whitespace below. */
+  min-height: 320px;
   display: flex;
   flex-direction: column;
   gap: 10px;
@@ -480,13 +485,14 @@ a { color: inherit; text-decoration: none; }
    key={idx} — that means every time the dial crosses a major tick, even
    mid-drag. The keyframe scales up briefly and settles for a tactile pop. */
 .lt-pricing-content {
-  animation: lt-pricing-thump 300ms cubic-bezier(0.34, 1.48, 0.64, 1);
+  animation: lt-pricing-thump 220ms cubic-bezier(0.22, 1.65, 0.42, 1);
   transform-origin: left center;
   will-change: transform;
 }
 @keyframes lt-pricing-thump {
-  0%   { transform: scale(0.93); }
-  45%  { transform: scale(1.07); }
+  0%   { transform: scale(0.86); }
+  35%  { transform: scale(1.16); }
+  68%  { transform: scale(0.98); }
   100% { transform: scale(1); }
 }
 
@@ -532,17 +538,41 @@ a { color: inherit; text-decoration: none; }
 /* Phosphorescent drag-hint — pulses on the visible rim until the user
    first touches the ring. Sits ABOVE the rotating dial so it stays still. */
 
-/* Pointer notch on the inner-left of the half-moon, pointing toward the text. */
+/* Pointer notch on the inner-left of the half-moon, pointing toward the text.
+   Vivid neon body + multi-layer drop-shadow that follows the arrow's clip-path
+   (no rectangular cutoff). Animates a subtle pulse continuously. */
 .lt-pricing-pointer {
   position: absolute;
   left: 4%;
   top: 50%;
-  width: 12px;
-  height: 16px;
-  background: var(--ink);
+  width: 14px;
+  height: 18px;
+  background: #34f5e0;
   transform: translateY(-50%);
   clip-path: polygon(100% 0, 0 50%, 100% 100%);
-  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.5));
+  filter:
+    drop-shadow(0 0 3px rgba(52, 245, 224, 1))
+    drop-shadow(0 0 8px rgba(52, 245, 224, 0.95))
+    drop-shadow(0 0 18px rgba(52, 245, 224, 0.7))
+    drop-shadow(0 0 30px rgba(52, 245, 224, 0.45));
+  animation: lt-pointer-pulse 2.6s ease-in-out infinite;
+  pointer-events: none;
+}
+@keyframes lt-pointer-pulse {
+  0%, 100% {
+    filter:
+      drop-shadow(0 0 3px rgba(52, 245, 224, 1))
+      drop-shadow(0 0 8px rgba(52, 245, 224, 0.9))
+      drop-shadow(0 0 18px rgba(52, 245, 224, 0.65))
+      drop-shadow(0 0 30px rgba(52, 245, 224, 0.4));
+  }
+  50% {
+    filter:
+      drop-shadow(0 0 4px rgba(52, 245, 224, 1))
+      drop-shadow(0 0 12px rgba(52, 245, 224, 1))
+      drop-shadow(0 0 24px rgba(52, 245, 224, 0.85))
+      drop-shadow(0 0 40px rgba(52, 245, 224, 0.55));
+  }
 }
 
 /* ===== Communities — 4 round buttons in a row ===== */
