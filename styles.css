@@ -506,8 +506,10 @@ a { color: inherit; text-decoration: none; }
      vertical drag only when the press lands on the outer ring (JS hit-test).
      We need pointer-events ON so handlers fire. */
   pointer-events: auto;
-  /* Block native pan-y inside this region so the drag isn't hijacked by scroll. */
-  touch-action: none;
+  /* Allow vertical page-scroll to pass through the dial — the JS hit-test
+     still catches drags that start on the rim, but the user can scroll
+     past the dial without the page sticking. */
+  touch-action: pan-y;
   filter:
     drop-shadow(0 14px 24px rgba(0, 0, 0, 0.7))
     drop-shadow(0 2px 4px rgba(0, 0, 0, 0.6));
@@ -530,38 +532,6 @@ a { color: inherit; text-decoration: none; }
 
 /* Phosphorescent drag-hint — pulses on the visible rim until the user
    first touches the ring. Sits ABOVE the rotating dial so it stays still. */
-/* The hint sits as a sibling of the dial-wrap so it does NOT inherit
-   the wrap's drop-shadow filter chain (which would flatten the glow
-   into a clipped rectangular layer). Same anchor + dimensions as the
-   wrap so the arc lines up exactly with the visible rim. */
-.lt-pricing-hint {
-  position: absolute;
-  right: -42%;
-  top: 50%;
-  transform: translateY(-50%);
-  width: 78%;
-  max-width: 380px;
-  aspect-ratio: 1;
-  pointer-events: none;
-  z-index: 4;
-  animation: lt-pricing-pulse 1.6s ease-in-out infinite;
-  /* Stacked drop-shadows produce a true gas halo that follows the path
-     shape — no rectangular clipping because there's no filter on parents. */
-  filter:
-    drop-shadow(0 0 4px  rgba(120, 255, 160, 1))
-    drop-shadow(0 0 10px rgba(80, 255, 140, 0.85))
-    drop-shadow(0 0 22px rgba(80, 255, 140, 0.55))
-    drop-shadow(0 0 40px rgba(80, 255, 140, 0.30));
-  /* Additive blend so the green lifts whatever is underneath instead of
-     covering it — looks like real neon gas. */
-  mix-blend-mode: screen;
-  overflow: visible;
-}
-.lt-pricing-hint svg { width: 100%; height: 100%; display: block; overflow: visible; }
-@keyframes lt-pricing-pulse {
-  0%, 100% { opacity: 0.32; }
-  50%      { opacity: 1; }
-}
 
 /* Pointer notch on the inner-left of the half-moon, pointing toward the text. */
 .lt-pricing-pointer {

@@ -133,7 +133,6 @@ function PricingDial() {
   const stepDeg = 360 / PRICING_SERVICES.length;
   const [angle, setAngle] = React.useState(0);
   const [dragging, setDragging] = React.useState(false);
-  const [hasInteracted, setHasInteracted] = React.useState(false);
   const wrapRef = React.useRef(null);
   const dragRef = React.useRef(null);
   const lastIdxRef = React.useRef(0);
@@ -167,7 +166,6 @@ function PricingDial() {
     if (dist < rInner || dist > rOuter * 1.02) return;
 
     setDragging(true);
-    setHasInteracted(true);
     dragRef.current = { startY: e.clientY, startAngle: angle };
     if (e.pointerId !== undefined && wrap.setPointerCapture) {
       try { wrap.setPointerCapture(e.pointerId); } catch (_) {}
@@ -315,47 +313,6 @@ function PricingDial() {
         <div className="lt-pricing-pointer" />
       </div>
 
-      {/* Phosphorescent hint — rendered OUTSIDE the dial-wrap so it doesn't
-          inherit dial-wrap's drop-shadow filter (which flattens children
-          into a rectangular layer and visually clips the glow). The
-          additive blend lets the gas halo bleed freely across the section. */}
-      {!hasInteracted && (
-        <div className="lt-pricing-hint" aria-hidden="true">
-          <svg viewBox="-140 -140 280 280" preserveAspectRatio="xMidYMid meet" overflow="visible">
-            <path
-              d="M -94 -28 A 98 98 0 0 0 -94 28"
-              fill="none"
-              stroke="rgb(60, 255, 130)"
-              strokeWidth="6"
-              strokeLinecap="round"
-              opacity="0.55" />
-            <path
-              d="M -94 -28 A 98 98 0 0 0 -94 28"
-              fill="none"
-              stroke="rgb(150, 255, 180)"
-              strokeWidth="3"
-              strokeLinecap="round" />
-            <path
-              d="M -94 -28 A 98 98 0 0 0 -94 28"
-              fill="none"
-              stroke="rgb(245, 255, 245)"
-              strokeWidth="1"
-              strokeLinecap="round" />
-            <path d="M -88 -38 L -82 -45 L -76 -38"
-              fill="none" stroke="rgb(60, 255, 130)" strokeWidth="4"
-              strokeLinecap="round" strokeLinejoin="round" opacity="0.55" />
-            <path d="M -88 -38 L -82 -45 L -76 -38"
-              fill="none" stroke="rgb(245, 255, 245)" strokeWidth="1.4"
-              strokeLinecap="round" strokeLinejoin="round" />
-            <path d="M -88 38 L -82 45 L -76 38"
-              fill="none" stroke="rgb(60, 255, 130)" strokeWidth="4"
-              strokeLinecap="round" strokeLinejoin="round" opacity="0.55" />
-            <path d="M -88 38 L -82 45 L -76 38"
-              fill="none" stroke="rgb(245, 255, 245)" strokeWidth="1.4"
-              strokeLinecap="round" strokeLinejoin="round" />
-          </svg>
-        </div>
-      )}
     </div>);
 }
 

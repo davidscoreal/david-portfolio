@@ -102,7 +102,6 @@
     const stepDeg = 360 / PRICING_SERVICES.length;
     const [angle, setAngle] = React.useState(0);
     const [dragging, setDragging] = React.useState(false);
-    const [hasInteracted, setHasInteracted] = React.useState(false);
     const wrapRef = React.useRef(null);
     const dragRef = React.useRef(null);
     const lastIdxRef = React.useRef(0);
@@ -131,7 +130,6 @@
       const rInner = rOuter * 0.74;
       if (dist < rInner || dist > rOuter * 1.02) return;
       setDragging(true);
-      setHasInteracted(true);
       dragRef.current = { startY: e.clientY, startAngle: angle };
       if (e.pointerId !== void 0 && wrap.setPointerCapture) {
         try {
@@ -233,77 +231,7 @@
         }), /* @__PURE__ */ React.createElement("circle", { r: "58", fill: "none", stroke: "rgba(244,241,234,0.10)", strokeWidth: "0.5" }), /* @__PURE__ */ React.createElement("circle", { r: "44", fill: "none", stroke: "rgba(244,241,234,0.06)", strokeWidth: "0.4" }), /* @__PURE__ */ React.createElement("circle", { r: "22", fill: "url(#lt-dial-hub)", stroke: "rgba(0,0,0,0.6)", strokeWidth: "0.6" }), /* @__PURE__ */ React.createElement("circle", { r: "22", fill: "none", stroke: "rgba(255,255,255,0.18)", strokeWidth: "0.5" }), /* @__PURE__ */ React.createElement("circle", { r: "14", fill: "#0a0a12", stroke: "rgba(255,255,255,0.10)", strokeWidth: "0.4" }), /* @__PURE__ */ React.createElement("line", { x1: "-9", y1: "0", x2: "9", y2: "0", stroke: "rgba(0,0,0,0.7)", strokeWidth: "1.4" }), /* @__PURE__ */ React.createElement("line", { x1: "-9", y1: "-0.6", x2: "9", y2: "-0.6", stroke: "rgba(255,255,255,0.18)", strokeWidth: "0.4" }), /* @__PURE__ */ React.createElement("circle", { r: "2.4", fill: "rgba(244,241,234,0.85)" }))
       ),
       /* @__PURE__ */ React.createElement("div", { className: "lt-pricing-pointer" })
-    ), !hasInteracted && /* @__PURE__ */ React.createElement("div", { className: "lt-pricing-hint", "aria-hidden": "true" }, /* @__PURE__ */ React.createElement("svg", { viewBox: "-140 -140 280 280", preserveAspectRatio: "xMidYMid meet", overflow: "visible" }, /* @__PURE__ */ React.createElement(
-      "path",
-      {
-        d: "M -94 -28 A 98 98 0 0 0 -94 28",
-        fill: "none",
-        stroke: "rgb(60, 255, 130)",
-        strokeWidth: "6",
-        strokeLinecap: "round",
-        opacity: "0.55"
-      }
-    ), /* @__PURE__ */ React.createElement(
-      "path",
-      {
-        d: "M -94 -28 A 98 98 0 0 0 -94 28",
-        fill: "none",
-        stroke: "rgb(150, 255, 180)",
-        strokeWidth: "3",
-        strokeLinecap: "round"
-      }
-    ), /* @__PURE__ */ React.createElement(
-      "path",
-      {
-        d: "M -94 -28 A 98 98 0 0 0 -94 28",
-        fill: "none",
-        stroke: "rgb(245, 255, 245)",
-        strokeWidth: "1",
-        strokeLinecap: "round"
-      }
-    ), /* @__PURE__ */ React.createElement(
-      "path",
-      {
-        d: "M -88 -38 L -82 -45 L -76 -38",
-        fill: "none",
-        stroke: "rgb(60, 255, 130)",
-        strokeWidth: "4",
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-        opacity: "0.55"
-      }
-    ), /* @__PURE__ */ React.createElement(
-      "path",
-      {
-        d: "M -88 -38 L -82 -45 L -76 -38",
-        fill: "none",
-        stroke: "rgb(245, 255, 245)",
-        strokeWidth: "1.4",
-        strokeLinecap: "round",
-        strokeLinejoin: "round"
-      }
-    ), /* @__PURE__ */ React.createElement(
-      "path",
-      {
-        d: "M -88 38 L -82 45 L -76 38",
-        fill: "none",
-        stroke: "rgb(60, 255, 130)",
-        strokeWidth: "4",
-        strokeLinecap: "round",
-        strokeLinejoin: "round",
-        opacity: "0.55"
-      }
-    ), /* @__PURE__ */ React.createElement(
-      "path",
-      {
-        d: "M -88 38 L -82 45 L -76 38",
-        fill: "none",
-        stroke: "rgb(245, 255, 245)",
-        strokeWidth: "1.4",
-        strokeLinecap: "round",
-        strokeLinejoin: "round"
-      }
-    ))));
+    ));
   }
   const COMMUNITIES = [
     { label: "TETR College", img: "assets/communities/tetr.png", href: "https://www.instagram.com/tetr.college/" },
