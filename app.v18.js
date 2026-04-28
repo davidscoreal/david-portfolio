@@ -393,7 +393,6 @@
       };
     }, [dragging, stepDeg]);
     const onDown = (e) => {
-      if (e.pointerType === "mouse" || e.pointerType === "pen") return;
       const wrap = wrapRef.current;
       if (!wrap) return;
       const rect = wrap.getBoundingClientRect();
