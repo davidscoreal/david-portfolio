@@ -312,19 +312,18 @@ a { color: inherit; text-decoration: none; }
   -webkit-user-select: none;
 }
 
-/* Video slide: black box with the video filling almost edge-to-edge.
-   `cover` crops top/bottom of vertical video so it spans the full slide
-   width — leaving only ~1mm of black on each side from the small inset. */
+/* Video slide: black box with video filling near edge-to-edge. The 4px
+   horizontal padding on the container leaves a ~1mm sliver of black on
+   each side. iOS Safari has flake with calc() on <video> sizing, so we
+   keep dimensions simple (100% width/height) and rely on padding. */
 .lt-marquee-item--video {
   filter: none;
   background: #000;
-  display: flex;
-  align-items: center;
-  justify-content: center;
   overflow: hidden;
+  padding: 0 4px;
 }
 .lt-marquee-video {
-  width: calc(100% - 8px);
+  width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
@@ -613,6 +612,9 @@ a { color: inherit; text-decoration: none; }
   letter-spacing: -0.005em;
   border-radius: 100px;
   text-decoration: none;
+  cursor: pointer;
+  user-select: none;
+  -webkit-user-select: none;
   transition: transform 0.15s ease, opacity 0.2s ease, background 0.2s ease;
   -webkit-tap-highlight-color: transparent;
 }

@@ -176,7 +176,7 @@ function PricingDial() {
     if (dist < rInner || dist > rOuter * 1.02) return;
 
     setDragging(true);
-    dragRef.current = { startY: e.clientY, startAngle: angle };
+    dragRef.current = { startX: e.clientX, startAngle: angle };
     if (e.pointerId !== undefined && wrap.setPointerCapture) {
       try { wrap.setPointerCapture(e.pointerId); } catch (_) {}
     }
@@ -184,9 +184,10 @@ function PricingDial() {
 
   const onMove = (e) => {
     if (!dragging || !dragRef.current) return;
-    const dy = e.clientY - dragRef.current.startY;
-    // 64px of vertical travel ≈ one detente (stepDeg). Drag up = forward (next service).
-    const next = dragRef.current.startAngle - (dy * (stepDeg / 64));
+    // Horizontal drag rotates the dial — vertical is reserved for page scroll
+    // (touch-action: pan-y on the wrap), so no gesture conflict on mobile.
+    const dx = e.clientX - dragRef.current.startX;
+    const next = dragRef.current.startAngle - (dx * (stepDeg / 64));
     setAngle(next);
     if (e.cancelable) e.preventDefault();
   };
@@ -336,19 +337,8 @@ const COMMUNITIES = [
 /* Coffee CTA — tap opens the native date picker; on date selection,
    open WhatsApp with a pre-filled message that includes the chosen date. */
 function CoffeeCTA() {
-  const inputRef = React.useRef(null);
+  const inputId = "lt-coffee-date";
   const PHONE = "573192441585";
-
-  const onClick = (e) => {
-    e.preventDefault();
-    const input = inputRef.current;
-    if (!input) return;
-    if (typeof input.showPicker === "function") {
-      try { input.showPicker(); return; } catch (_) {}
-    }
-    input.focus();
-    try { input.click(); } catch (_) {}
-  };
 
   const onChange = (e) => {
     const v = e.target.value;
@@ -365,23 +355,21 @@ function CoffeeCTA() {
 
   const todayISO = new Date().toISOString().slice(0, 10);
 
+  // Native <label htmlFor> opens the date input on tap on every platform —
+  // iOS Safari included — without relying on showPicker() (Safari ≥ 16.4).
   return (
     <div className="lt-cta-wrap">
-      <a
-        className="lt-cta"
-        href="#"
-        onClick={onClick}
-        role="button">
-        <span className="lt-cta-text">let's get a</span>
-        <span className="lt-cta-emoji" aria-hidden="true">☕</span>
-      </a>
       <input
-        ref={inputRef}
+        id={inputId}
         type="date"
         className="lt-cta-date"
         min={todayISO}
         onChange={onChange}
         aria-label="Pick a date for our coffee chat" />
+      <label className="lt-cta" htmlFor={inputId}>
+        <span className="lt-cta-text">let's get a</span>
+        <span className="lt-cta-emoji" aria-hidden="true">☕</span>
+      </label>
     </div>);
 }
 

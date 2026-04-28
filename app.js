@@ -136,7 +136,7 @@
       const rInner = rOuter * 0.74;
       if (dist < rInner || dist > rOuter * 1.02) return;
       setDragging(true);
-      dragRef.current = { startY: e.clientY, startAngle: angle };
+      dragRef.current = { startX: e.clientX, startAngle: angle };
       if (e.pointerId !== void 0 && wrap.setPointerCapture) {
         try {
           wrap.setPointerCapture(e.pointerId);
@@ -146,8 +146,8 @@
     };
     const onMove = (e) => {
       if (!dragging || !dragRef.current) return;
-      const dy = e.clientY - dragRef.current.startY;
-      const next = dragRef.current.startAngle - dy * (stepDeg / 64);
+      const dx = e.clientX - dragRef.current.startX;
+      const next = dragRef.current.startAngle - dx * (stepDeg / 64);
       setAngle(next);
       if (e.cancelable) e.preventDefault();
     };
@@ -246,25 +246,8 @@
     { label: "Club KSE", img: "assets/communities/clubkse.png", href: "https://www.instagram.com/clubkse/" }
   ];
   function CoffeeCTA() {
-    const inputRef = React.useRef(null);
+    const inputId = "lt-coffee-date";
     const PHONE = "573192441585";
-    const onClick = (e) => {
-      e.preventDefault();
-      const input = inputRef.current;
-      if (!input) return;
-      if (typeof input.showPicker === "function") {
-        try {
-          input.showPicker();
-          return;
-        } catch (_) {
-        }
-      }
-      input.focus();
-      try {
-        input.click();
-      } catch (_) {
-      }
-    };
     const onChange = (e) => {
       const v = e.target.value;
       if (!v) return;
@@ -281,26 +264,16 @@
     };
     const todayISO = (/* @__PURE__ */ new Date()).toISOString().slice(0, 10);
     return /* @__PURE__ */ React.createElement("div", { className: "lt-cta-wrap" }, /* @__PURE__ */ React.createElement(
-      "a",
-      {
-        className: "lt-cta",
-        href: "#",
-        onClick,
-        role: "button"
-      },
-      /* @__PURE__ */ React.createElement("span", { className: "lt-cta-text" }, "let's get a"),
-      /* @__PURE__ */ React.createElement("span", { className: "lt-cta-emoji", "aria-hidden": "true" }, "\u2615")
-    ), /* @__PURE__ */ React.createElement(
       "input",
       {
-        ref: inputRef,
+        id: inputId,
         type: "date",
         className: "lt-cta-date",
         min: todayISO,
         onChange,
         "aria-label": "Pick a date for our coffee chat"
       }
-    ));
+    ), /* @__PURE__ */ React.createElement("label", { className: "lt-cta", htmlFor: inputId }, /* @__PURE__ */ React.createElement("span", { className: "lt-cta-text" }, "let's get a"), /* @__PURE__ */ React.createElement("span", { className: "lt-cta-emoji", "aria-hidden": "true" }, "\u2615")));
   }
   function App() {
     return /* @__PURE__ */ React.createElement("main", { className: "lt" }, /* @__PURE__ */ React.createElement("div", { className: "lt-shell" }, /* @__PURE__ */ React.createElement("header", { className: "lt-header" }, /* @__PURE__ */ React.createElement("span", { className: "lt-eyebrow" }, "GRATEFULLY \u{1F1E8}\u{1F1F4}"), /* @__PURE__ */ React.createElement("h1", { className: "lt-title" }, /* @__PURE__ */ React.createElement("img", { className: "lt-bird", src: "assets/colibri-cutout.png?v=3", alt: "", "aria-hidden": "true" }), /* @__PURE__ */ React.createElement("span", { className: "lt-row lt-row-port" }, /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "P"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "O"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "R"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "T")), /* @__PURE__ */ React.createElement("span", { className: "lt-row lt-row-folio" }, /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "F"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "O"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter lt-letter-over" }, "L"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter lt-letter-over" }, "I"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter lt-letter-over" }, "O")))), /* @__PURE__ */ React.createElement("section", { className: "lt-id-block" }, /* @__PURE__ */ React.createElement("p", { className: "lt-name" }, "David Steban R L\xF3pez"), /* @__PURE__ */ React.createElement("nav", { className: "lt-icons", "aria-label": "Links" }, LINKS.map(
