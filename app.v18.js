@@ -539,8 +539,7 @@
       /* @__PURE__ */ React.createElement("p", null, "I’m David. A builder from Bogot\xE1."),
       /* @__PURE__ */ React.createElement("p", null, "I crossed enough internal deserts to know what real transformation feels like."),
       /* @__PURE__ */ React.createElement("p", null, "At C.I.A., Systems go far beyond automation."),
-      /* @__PURE__ */ React.createElement("p", null, "They help organizations return to what truly matters,"),
-      /* @__PURE__ */ React.createElement("p", null, "so their people can focus on what’s essential.")
+      /* @__PURE__ */ React.createElement("p", null, "They help organizations return to what truly matters, so their people can focus on what’s essential.")
     ), /* @__PURE__ */ React.createElement("nav", { className: "lt-icons", "aria-label": "Links" }, LINKS.map(
       (l) => /* @__PURE__ */ React.createElement(
         "a",
