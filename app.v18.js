@@ -363,10 +363,15 @@
       if (!dragging) return;
       const onWinMove = (ev) => {
         if (!dragRef.current) return;
-        const cx = ev.clientX !== undefined ? ev.clientX : (ev.touches && ev.touches[0] && ev.touches[0].clientX);
-        if (cx === undefined) return;
-        const dx = cx - dragRef.current.startX;
-        setAngle(dragRef.current.startAngle - dx * (stepDeg / 64));
+        const px = ev.clientX !== undefined ? ev.clientX : (ev.touches && ev.touches[0] && ev.touches[0].clientX);
+        const py = ev.clientY !== undefined ? ev.clientY : (ev.touches && ev.touches[0] && ev.touches[0].clientY);
+        if (px === undefined || py === undefined) return;
+        // Angular rotation: how many degrees has the finger swept around
+        // the dial center since touch-down? Apply that delta to the dial.
+        let delta = (Math.atan2(py - dragRef.current.cy, px - dragRef.current.cx) * 180 / Math.PI) - dragRef.current.startTouchAngle;
+        while (delta > 180) delta -= 360;
+        while (delta < -180) delta += 360;
+        setAngle(dragRef.current.startAngle + delta);
         if (ev.cancelable) ev.preventDefault();
       };
       const onWinUp = () => {
@@ -405,9 +410,10 @@
       const dy = py - cy;
       const dist = Math.hypot(dx, dy);
       const rOuter = rect.width / 2;
-      const rInner = rOuter * 0.74;
-      if (dist < rInner || dist > rOuter * 1.02) return;
-      dragRef.current = { startX: px, startAngle: angle };
+      // Wide hit area: anywhere on the visible half-moon counts (not just the rim).
+      if (dist > rOuter * 1.05) return;
+      const startTouchAngle = Math.atan2(dy, dx) * 180 / Math.PI;
+      dragRef.current = { cx, cy, startTouchAngle, startAngle: angle };
       setDragging(true);
       if (e.cancelable) e.preventDefault();
     };
