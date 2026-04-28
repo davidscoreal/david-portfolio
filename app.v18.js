@@ -357,8 +357,9 @@
       }
     }, [idx]);
     const onDown = (e) => {
-      // Touch only — no mouse, no stylus. The dial is for mobile.
-      if (e.pointerType && e.pointerType !== "touch") return;
+      // Block desktop mouse/stylus. Touch (and any device that doesn't
+      // identify its pointerType) is allowed through.
+      if (e.pointerType === "mouse" || e.pointerType === "pen") return;
       const wrap = wrapRef.current;
       if (!wrap) return;
       const rect = wrap.getBoundingClientRect();
@@ -371,10 +372,7 @@
       const rInner = rOuter * 0.74;
       if (dist < rInner || dist > rOuter * 1.02) return;
       setDragging(true);
-      // Angular drag: record the touch's angle relative to the dial center,
-      // and rotate the dial by however many degrees the finger sweeps around.
-      const startTouchAngle = Math.atan2(dy, dx) * 180 / Math.PI;
-      dragRef.current = { startTouchAngle, startAngle: angle };
+      dragRef.current = { startX: e.clientX, startAngle: angle };
       if (e.pointerId !== void 0 && wrap.setPointerCapture) {
         try {
           wrap.setPointerCapture(e.pointerId);
@@ -384,19 +382,9 @@
     };
     const onMove = (e) => {
       if (!dragging || !dragRef.current) return;
-      const wrap = wrapRef.current;
-      if (!wrap) return;
-      const rect = wrap.getBoundingClientRect();
-      const cx = rect.left + rect.width / 2;
-      const cy = rect.top + rect.height / 2;
-      const dx = e.clientX - cx;
-      const dy = e.clientY - cy;
-      const currentTouchAngle = Math.atan2(dy, dx) * 180 / Math.PI;
-      let delta = currentTouchAngle - dragRef.current.startTouchAngle;
-      // Unwrap so successive swipes accumulate naturally
-      while (delta > 180) delta -= 360;
-      while (delta < -180) delta += 360;
-      setAngle(dragRef.current.startAngle + delta);
+      const dx = e.clientX - dragRef.current.startX;
+      const next = dragRef.current.startAngle - dx * (stepDeg / 64);
+      setAngle(next);
       if (e.cancelable) e.preventDefault();
     };
     const onUp = () => {
@@ -703,11 +691,11 @@
       let dragVelocity = 0;
       let releaseVelocity = 0;
       let releaseTime = 0;
-      // After releasing a touch: hold the marquee static for HOLD_MS so the
-      // user can finish reading what they tapped, then ramp back to baseVel
-      // over RAMP_MS. Total dwell ≈ 7s.
-      const HOLD_MS = 5e3;
-      const RAMP_MS = 2e3;
+      // After releasing a touch: ease the flick velocity (momentum from the
+      // user's swipe) back toward baseVel over SETTLE_MS. A strong flick
+      // keeps the carousel moving fast, then smoothly settles into the
+      // base scroll. A gentle tap (low velocity) blends quickly to base.
+      const SETTLE_MS = 7e3;
       const MOVE_THRESHOLD = 8;
       const wrapOffset = () => {
         const hw = halfWidth();
@@ -722,12 +710,10 @@
           let velocity;
           if (releaseTime > 0) {
             const elapsed = now - releaseTime;
-            if (elapsed < HOLD_MS) {
-              velocity = 0;
-            } else if (elapsed < HOLD_MS + RAMP_MS) {
-              const k = (elapsed - HOLD_MS) / RAMP_MS;
+            if (elapsed < SETTLE_MS) {
+              const k = elapsed / SETTLE_MS;
               const eased = 1 - Math.pow(1 - k, 3);
-              velocity = baseVel * eased;
+              velocity = releaseVelocity * (1 - eased) + baseVel * eased;
             } else {
               velocity = baseVel;
               releaseTime = 0;
