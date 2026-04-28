@@ -312,9 +312,9 @@ a { color: inherit; text-decoration: none; }
   -webkit-user-select: none;
 }
 
-/* Video slide: black box with the video centered, contained (letterboxed)
-   so vertical video doesn't get cropped — the side bars are just black,
-   matching the page background. */
+/* Video slide: black box with the video filling almost edge-to-edge.
+   `cover` crops top/bottom of vertical video so it spans the full slide
+   width — leaving only ~1mm of black on each side from the small inset. */
 .lt-marquee-item--video {
   filter: none;
   background: #000;
@@ -324,9 +324,9 @@ a { color: inherit; text-decoration: none; }
   overflow: hidden;
 }
 .lt-marquee-video {
-  width: 100%;
+  width: calc(100% - 8px);
   height: 100%;
-  object-fit: contain;
+  object-fit: cover;
   display: block;
   pointer-events: none;
 }
