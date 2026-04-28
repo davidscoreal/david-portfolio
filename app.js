@@ -72,6 +72,219 @@
       /* @__PURE__ */ React.createElement("div", { className: "lt-marquee-overlay", "aria-hidden": "true" }, /* @__PURE__ */ React.createElement("span", { className: "lt-marquee-label" }, "Mission Control"))
     );
   }
+  const LOVE_IMAGES = [
+    "assets/love/01-manifesto.png",
+    "assets/love/02-deterministic.jpg",
+    "assets/love/03-nexus-protocol.jpg",
+    "assets/love/04-impact-matrix.jpg"
+  ];
+  function LoveSlide({ ariaHidden, tabIndex }) {
+    return /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        className: "lt-marquee-item lt-marquee-item--photo lt-mission lt-love lt-marquee-item--labeled",
+        "aria-label": "Love Protocol \u2014 deterministic coordination layer",
+        "aria-hidden": ariaHidden,
+        tabIndex
+      },
+      LOVE_IMAGES.map(
+        (src) => /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            key: src,
+            className: "lt-mission-frame",
+            style: { backgroundImage: `url('${src}')` }
+          }
+        )
+      ),
+      /* @__PURE__ */ React.createElement("div", { className: "lt-marquee-overlay", "aria-hidden": "true" }, /* @__PURE__ */ React.createElement("span", { className: "lt-marquee-label" }, "Love Protocol"))
+    );
+  }
+  const LEAD_ENDPOINT = "https://script.google.com/macros/s/AKfycbw-bI8fdA1W4pjBG3QaFyPReowh8gMxU2cNE9rw2UfUl9Mg92K76XFlvD3_OyPVW5QTMw/exec";
+  const COUNTRIES = [
+    { code: "+57", flag: "\u{1F1E8}\u{1F1F4}", name: "Colombia" },
+    { code: "+52", flag: "\u{1F1F2}\u{1F1FD}", name: "M\xE9xico" },
+    { code: "+34", flag: "\u{1F1EA}\u{1F1F8}", name: "Espa\xF1a" },
+    { code: "+1",  flag: "\u{1F1FA}\u{1F1F8}", name: "USA / Canada" },
+    { code: "+55", flag: "\u{1F1E7}\u{1F1F7}", name: "Brasil" },
+    { code: "other", flag: "\u{1F310}", name: "Otro" }
+  ];
+  function LeadSheet({ open, service, onClose }) {
+    const [name, setName] = React.useState("");
+    const [email, setEmail] = React.useState("");
+    const [country, setCountry] = React.useState("+57");
+    const [customCode, setCustomCode] = React.useState("");
+    const [phone, setPhone] = React.useState("");
+    const [message, setMessage] = React.useState("");
+    const [status, setStatus] = React.useState("idle");
+    const [errors, setErrors] = React.useState({});
+    const sheetRef = React.useRef(null);
+    const dragRef = React.useRef(null);
+    const [dragY, setDragY] = React.useState(0);
+    React.useEffect(() => {
+      if (!open) {
+        const t = setTimeout(() => {
+          setStatus("idle");
+          setErrors({});
+          setDragY(0);
+        }, 320);
+        return () => clearTimeout(t);
+      }
+      document.body.style.overflow = "hidden";
+      return () => { document.body.style.overflow = ""; };
+    }, [open]);
+    const validate = () => {
+      const e = {};
+      if (!name.trim()) e.name = "Tu nombre";
+      if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim())) e.email = "Email inv\xE1lido";
+      const phoneDigits = phone.replace(/\D/g, "");
+      if (phoneDigits.length < 7) e.phone = "M\xEDn. 7 d\xEDgitos";
+      if (country === "other" && !/^\+\d{1,4}$/.test(customCode.trim())) e.customCode = "+xx";
+      setErrors(e);
+      return Object.keys(e).length === 0;
+    };
+    const submit = async (ev) => {
+      ev.preventDefault();
+      if (!validate()) return;
+      setStatus("submitting");
+      const code = country === "other" ? customCode.trim() : country;
+      const payload = {
+        timestamp: (/* @__PURE__ */ new Date()).toISOString(),
+        name: name.trim(),
+        email: email.trim(),
+        phone: code + " " + phone.replace(/\D/g, ""),
+        country_code: code,
+        service: service || "(general)",
+        message: message.trim(),
+        source: "portfolio"
+      };
+      try {
+        if (LEAD_ENDPOINT) {
+          await fetch(LEAD_ENDPOINT, {
+            method: "POST",
+            mode: "no-cors",
+            headers: { "Content-Type": "text/plain;charset=utf-8" },
+            body: JSON.stringify(payload)
+          });
+        } else {
+          console.log("[lead]", payload);
+          await new Promise((r) => setTimeout(r, 600));
+        }
+        setStatus("success");
+        setName(""); setEmail(""); setPhone(""); setMessage(""); setCustomCode("");
+      } catch (err) {
+        console.error(err);
+        setStatus("error");
+      }
+    };
+    const onHandleDown = (e) => {
+      dragRef.current = { startY: e.clientY };
+      if (e.pointerId !== void 0 && e.currentTarget.setPointerCapture) {
+        try { e.currentTarget.setPointerCapture(e.pointerId); } catch (_) {}
+      }
+    };
+    const onHandleMove = (e) => {
+      if (!dragRef.current) return;
+      const dy = Math.max(0, e.clientY - dragRef.current.startY);
+      setDragY(dy);
+    };
+    const onHandleUp = () => {
+      if (!dragRef.current) return;
+      const dy = dragY;
+      dragRef.current = null;
+      if (dy > 110) {
+        onClose();
+      } else {
+        setDragY(0);
+      }
+    };
+    return /* @__PURE__ */ React.createElement(
+      "div",
+      {
+        className: "lt-sheet-root " + (open ? "lt-sheet-root--open" : ""),
+        "aria-hidden": !open
+      },
+      /* @__PURE__ */ React.createElement("div", { className: "lt-sheet-backdrop", onClick: onClose }),
+      /* @__PURE__ */ React.createElement(
+        "div",
+        {
+          ref: sheetRef,
+          className: "lt-sheet",
+          role: "dialog",
+          "aria-modal": "true",
+          "aria-label": "Solicitar informaci\xF3n",
+          style: { transform: `translateY(${dragY}px)` }
+        },
+        /* @__PURE__ */ React.createElement(
+          "div",
+          {
+            className: "lt-sheet-handle-area",
+            onPointerDown: onHandleDown,
+            onPointerMove: onHandleMove,
+            onPointerUp: onHandleUp,
+            onPointerCancel: onHandleUp
+          },
+          /* @__PURE__ */ React.createElement("div", { className: "lt-sheet-handle" })
+        ),
+        status === "success"
+          ? /* @__PURE__ */ React.createElement("div", { className: "lt-sheet-success" },
+              /* @__PURE__ */ React.createElement("div", { className: "lt-sheet-success-icon" }, "✓"),
+              /* @__PURE__ */ React.createElement("h3", null, "\xA1Listo!"),
+              /* @__PURE__ */ React.createElement("p", null, "Te contacto en menos de 24h."),
+              /* @__PURE__ */ React.createElement("button", { type: "button", className: "lt-sheet-close-btn", onClick: onClose }, "Cerrar")
+            )
+          : /* @__PURE__ */ React.createElement("form", { className: "lt-sheet-form", onSubmit: submit, noValidate: true },
+              /* @__PURE__ */ React.createElement("div", { className: "lt-sheet-eyebrow" }, service || "Solicitar info"),
+              /* @__PURE__ */ React.createElement("h3", { className: "lt-sheet-title" }, "Cu\xE9ntame"),
+              /* @__PURE__ */ React.createElement("p", { className: "lt-sheet-sub" }, "D\xE9jame tu info y te contacto personalmente."),
+              /* @__PURE__ */ React.createElement("label", { className: "lt-field" + (errors.name ? " lt-field--err" : "") },
+                /* @__PURE__ */ React.createElement("span", null, "Nombre"),
+                /* @__PURE__ */ React.createElement("input", { type: "text", value: name, onChange: (e) => setName(e.target.value), placeholder: "Tu nombre", autoComplete: "name" })
+              ),
+              /* @__PURE__ */ React.createElement("label", { className: "lt-field" + (errors.email ? " lt-field--err" : "") },
+                /* @__PURE__ */ React.createElement("span", null, "Email"),
+                /* @__PURE__ */ React.createElement("input", { type: "email", value: email, onChange: (e) => setEmail(e.target.value), placeholder: "tu@email.com", autoComplete: "email", inputMode: "email" })
+              ),
+              /* @__PURE__ */ React.createElement("div", { className: "lt-field-row" },
+                /* @__PURE__ */ React.createElement("label", { className: "lt-field lt-field--country" },
+                  /* @__PURE__ */ React.createElement("span", null, "Pa\xEDs"),
+                  /* @__PURE__ */ React.createElement("select", { value: country, onChange: (e) => setCountry(e.target.value) },
+                    COUNTRIES.map((c) => /* @__PURE__ */ React.createElement("option", { key: c.code, value: c.code },
+                      c.flag + "  " + (c.code === "other" ? c.name : c.code + " " + c.name)
+                    ))
+                  )
+                ),
+                country === "other"
+                  ? /* @__PURE__ */ React.createElement("label", { className: "lt-field lt-field--ccode" + (errors.customCode ? " lt-field--err" : "") },
+                      /* @__PURE__ */ React.createElement("span", null, "C\xF3digo"),
+                      /* @__PURE__ */ React.createElement("input", { type: "tel", value: customCode, onChange: (e) => setCustomCode(e.target.value), placeholder: "+44", inputMode: "tel" })
+                    )
+                  : null,
+                /* @__PURE__ */ React.createElement("label", { className: "lt-field lt-field--phone" + (errors.phone ? " lt-field--err" : "") },
+                  /* @__PURE__ */ React.createElement("span", null, "Tel\xE9fono"),
+                  /* @__PURE__ */ React.createElement("input", { type: "tel", value: phone, onChange: (e) => setPhone(e.target.value), placeholder: "300 123 4567", autoComplete: "tel", inputMode: "tel" })
+                )
+              ),
+              /* @__PURE__ */ React.createElement("label", { className: "lt-field" },
+                /* @__PURE__ */ React.createElement("span", null, "Mensaje (opcional)"),
+                /* @__PURE__ */ React.createElement("textarea", { value: message, onChange: (e) => setMessage(e.target.value), placeholder: "Cu\xE9ntame brevemente tu contexto", rows: 3 })
+              ),
+              status === "error"
+                ? /* @__PURE__ */ React.createElement("div", { className: "lt-sheet-err-msg" }, "Algo fall\xF3. Probemos de nuevo.")
+                : null,
+              /* @__PURE__ */ React.createElement(
+                "button",
+                {
+                  type: "submit",
+                  className: "lt-sheet-submit",
+                  disabled: status === "submitting"
+                },
+                status === "submitting" ? "Enviando…" : "Enviar"
+              )
+            )
+      )
+    );
+  }
   const PRICING_SERVICES = [
     {
       title: "Revenue Leak Audit",
@@ -104,7 +317,7 @@
       desc: "Security review of smart contracts (Solidity, Rust/Solana, Move) before mainnet deployment. Static and dynamic analysis, detection of known vulnerability patterns \u2014 reentrancy, overflow, access control flaws \u2014 attack simulation, and a severity-classified report. Includes remediation guidance and a re-audit after fixes."
     }
   ];
-  function PricingDial() {
+  function PricingDial({ onRequestInfo }) {
     const stepDeg = 360 / PRICING_SERVICES.length;
     const [angle, setAngle] = React.useState(0);
     const [dragging, setDragging] = React.useState(false);
@@ -165,7 +378,7 @@
       }
     };
     const s = PRICING_SERVICES[idx];
-    return /* @__PURE__ */ React.createElement("div", { className: "lt-pricing " + (dragging ? "lt-pricing--dragging" : "lt-pricing--locked") }, /* @__PURE__ */ React.createElement("div", { className: "lt-pricing-content", key: idx }, /* @__PURE__ */ React.createElement("h3", { className: "lt-pricing-title" }, s.title), /* @__PURE__ */ React.createElement("div", { className: "lt-pricing-price" }, s.price), /* @__PURE__ */ React.createElement("p", { className: "lt-pricing-desc" }, s.desc)), /* @__PURE__ */ React.createElement(
+    return /* @__PURE__ */ React.createElement("div", { className: "lt-pricing " + (dragging ? "lt-pricing--dragging" : "lt-pricing--locked") }, /* @__PURE__ */ React.createElement("div", { className: "lt-pricing-content", key: idx }, /* @__PURE__ */ React.createElement("h3", { className: "lt-pricing-title" }, s.title), /* @__PURE__ */ React.createElement("div", { className: "lt-pricing-price" }, s.price), /* @__PURE__ */ React.createElement("p", { className: "lt-pricing-desc" }, s.desc), /* @__PURE__ */ React.createElement("button", { type: "button", className: "lt-pricing-cta", onClick: () => onRequestInfo && onRequestInfo(s.title) }, "Solicitar info →")), /* @__PURE__ */ React.createElement(
       "div",
       {
         className: "lt-pricing-dial-wrap",
@@ -276,7 +489,11 @@
     ), /* @__PURE__ */ React.createElement("label", { className: "lt-cta", htmlFor: inputId }, /* @__PURE__ */ React.createElement("span", { className: "lt-cta-text" }, "let's get a"), /* @__PURE__ */ React.createElement("span", { className: "lt-cta-emoji", "aria-hidden": "true" }, "\u2615")));
   }
   function App() {
-    return /* @__PURE__ */ React.createElement("main", { className: "lt" }, /* @__PURE__ */ React.createElement("div", { className: "lt-shell" }, /* @__PURE__ */ React.createElement("header", { className: "lt-header" }, /* @__PURE__ */ React.createElement("span", { className: "lt-eyebrow" }, "GRATEFULLY \u{1F1E8}\u{1F1F4}"), /* @__PURE__ */ React.createElement("h1", { className: "lt-title" }, /* @__PURE__ */ React.createElement("img", { className: "lt-bird", src: "assets/colibri-cutout.png?v=3", alt: "", "aria-hidden": "true" }), /* @__PURE__ */ React.createElement("span", { className: "lt-row lt-row-port" }, /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "P"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "O"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "R"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "T")), /* @__PURE__ */ React.createElement("span", { className: "lt-row lt-row-folio" }, /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "F"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "O"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter lt-letter-over" }, "L"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter lt-letter-over" }, "I"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter lt-letter-over" }, "O")))), /* @__PURE__ */ React.createElement("section", { className: "lt-id-block" }, /* @__PURE__ */ React.createElement("p", { className: "lt-name" }, "David Steban R L\xF3pez"), /* @__PURE__ */ React.createElement("nav", { className: "lt-icons", "aria-label": "Links" }, LINKS.map(
+    const [leadOpen, setLeadOpen] = React.useState(false);
+    const [leadService, setLeadService] = React.useState(null);
+    const openLead = (svc) => { setLeadService(svc); setLeadOpen(true); };
+    const closeLead = () => setLeadOpen(false);
+    return /* @__PURE__ */ React.createElement("main", { className: "lt" }, /* @__PURE__ */ React.createElement(LeadSheet, { open: leadOpen, service: leadService, onClose: closeLead }), /* @__PURE__ */ React.createElement("div", { className: "lt-shell" }, /* @__PURE__ */ React.createElement("header", { className: "lt-header" }, /* @__PURE__ */ React.createElement("span", { className: "lt-eyebrow" }, "GRATEFULLY \u{1F1E8}\u{1F1F4}"), /* @__PURE__ */ React.createElement("h1", { className: "lt-title" }, /* @__PURE__ */ React.createElement("img", { className: "lt-bird", src: "assets/colibri-cutout.png?v=3", alt: "", "aria-hidden": "true" }), /* @__PURE__ */ React.createElement("span", { className: "lt-row lt-row-port" }, /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "P"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "O"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "R"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "T")), /* @__PURE__ */ React.createElement("span", { className: "lt-row lt-row-folio" }, /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "F"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter" }, "O"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter lt-letter-over" }, "L"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter lt-letter-over" }, "I"), /* @__PURE__ */ React.createElement("span", { className: "lt-letter lt-letter-over" }, "O")))), /* @__PURE__ */ React.createElement("section", { className: "lt-id-block" }, /* @__PURE__ */ React.createElement("p", { className: "lt-name" }, "David Steban R L\xF3pez"), /* @__PURE__ */ React.createElement("nav", { className: "lt-icons", "aria-label": "Links" }, LINKS.map(
       (l) => /* @__PURE__ */ React.createElement(
         "a",
         {
@@ -301,7 +518,7 @@
         style: { backgroundImage: "url('assets/cia-cover.png?v=1')" }
       },
       /* @__PURE__ */ React.createElement("div", { className: "lt-marquee-overlay", "aria-hidden": "true" }, /* @__PURE__ */ React.createElement("span", { className: "lt-marquee-label" }, "CIA Store"))
-    ), /* @__PURE__ */ React.createElement(MissionSlide, null), /* @__PURE__ */ React.createElement("div", { className: "lt-marquee-item lt-marquee-item--video lt-marquee-item--labeled" }, /* @__PURE__ */ React.createElement(
+    ), /* @__PURE__ */ React.createElement(MissionSlide, null), /* @__PURE__ */ React.createElement(LoveSlide, null), /* @__PURE__ */ React.createElement("a", { className: "lt-marquee-item lt-marquee-item--video lt-marquee-item--labeled", href: "https://github.com/davidscoreal", target: "_blank", rel: "noopener noreferrer", "aria-label": "GitHub — davidscoreal (open in new tab)" }, /* @__PURE__ */ React.createElement(
       "video",
       {
         className: "lt-marquee-video",
@@ -324,7 +541,7 @@
         style: { backgroundImage: "url('assets/cia-cover.png?v=1')" }
       },
       /* @__PURE__ */ React.createElement("div", { className: "lt-marquee-overlay", "aria-hidden": "true" }, /* @__PURE__ */ React.createElement("span", { className: "lt-marquee-label" }, "CIA Store"))
-    ), /* @__PURE__ */ React.createElement(MissionSlide, { ariaHidden: true, tabIndex: -1 }), /* @__PURE__ */ React.createElement("div", { className: "lt-marquee-item lt-marquee-item--video lt-marquee-item--labeled", "aria-hidden": "true" }, /* @__PURE__ */ React.createElement(
+    ), /* @__PURE__ */ React.createElement(MissionSlide, { ariaHidden: true, tabIndex: -1 }), /* @__PURE__ */ React.createElement(LoveSlide, { ariaHidden: true, tabIndex: -1 }), /* @__PURE__ */ React.createElement("div", { className: "lt-marquee-item lt-marquee-item--video lt-marquee-item--labeled", "aria-hidden": "true" }, /* @__PURE__ */ React.createElement(
       "video",
       {
         className: "lt-marquee-video",
@@ -397,7 +614,7 @@
         preload: "auto",
         tabIndex: -1
       }
-    ), /* @__PURE__ */ React.createElement("div", { className: "lt-marquee-overlay", "aria-hidden": "true" }, /* @__PURE__ */ React.createElement("span", { className: "lt-marquee-label" }, "Blockchain Contract Auditing")))))), /* @__PURE__ */ React.createElement("section", { className: "lt-block" }, /* @__PURE__ */ React.createElement("h2", { className: "lt-section-title" }, "PRICING"), /* @__PURE__ */ React.createElement(PricingDial, null)), /* @__PURE__ */ React.createElement("section", { className: "lt-block" }, /* @__PURE__ */ React.createElement("h2", { className: "lt-section-title" }, "COMMUNITIES"), /* @__PURE__ */ React.createElement("div", { className: "lt-communities", "aria-label": "Communities" }, COMMUNITIES.map(
+    ), /* @__PURE__ */ React.createElement("div", { className: "lt-marquee-overlay", "aria-hidden": "true" }, /* @__PURE__ */ React.createElement("span", { className: "lt-marquee-label" }, "Blockchain Contract Auditing")))))), /* @__PURE__ */ React.createElement("section", { className: "lt-block" }, /* @__PURE__ */ React.createElement("h2", { className: "lt-section-title" }, "PRICING"), /* @__PURE__ */ React.createElement(PricingDial, { onRequestInfo: openLead })), /* @__PURE__ */ React.createElement("section", { className: "lt-block" }, /* @__PURE__ */ React.createElement("h2", { className: "lt-section-title" }, "COMMUNITIES"), /* @__PURE__ */ React.createElement("div", { className: "lt-communities", "aria-label": "Communities" }, COMMUNITIES.map(
       (c) => /* @__PURE__ */ React.createElement(
         "a",
         {
