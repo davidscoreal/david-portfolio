@@ -411,7 +411,7 @@ function App() {
         </header>
 
         <section className="lt-id-block">
-          <p className="lt-name">David Steban López</p>
+          <p className="lt-name">David Steban R López</p>
           <nav className="lt-icons" aria-label="Links">
             {LINKS.map((l) =>
             <a
