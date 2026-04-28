@@ -143,22 +143,27 @@ a { color: inherit; text-decoration: none; }
   text-align: center;
 }
 
-/* Bio block: 5-line manifesto under the PORTFOLIO wordmark. Serif italic-feel
-   light weight to read as a personal note, not a heading. */
+/* Bio: 5 short sentences under the PORTFOLIO wordmark. Single Inter family
+   to stay coherent with the rest of the system; light weight (300) creates
+   the contrast against the heavy 800 of titles. Each sentence is its own
+   <p> so it wraps naturally per viewport instead of being forced by \n. */
 .lt-bio {
-  margin: 0;
-  max-width: 36ch;
-  font-family: "Fraunces", Georgia, serif;
+  margin: 0 auto;
+  max-width: 32ch;
+  font-family: -apple-system, BlinkMacSystemFont, "Inter", system-ui, sans-serif;
   font-weight: 300;
-  font-size: clamp(18px, 5.4vw, 24px);
-  line-height: 1.4;
-  /* tight letters within words, generous space between words */
-  letter-spacing: -0.035em;
-  word-spacing: 0.18em;
+  font-size: clamp(16px, 4.6vw, 19px);
+  line-height: 1.55;
+  letter-spacing: -0.015em;
   color: var(--ink);
   text-align: center;
-  white-space: pre-line;
-  text-wrap: balance;
+  text-wrap: pretty;
+}
+.lt-bio p {
+  margin: 0 0 6px;
+}
+.lt-bio p:last-child {
+  margin: 0;
 }
 
 /* Name + icons paired together: name hugs the icons (~1mm gap) */
