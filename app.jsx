@@ -23,6 +23,11 @@ const LINKS = [
   icon: "wa"
 },
 {
+  label: "X",
+  href: "https://x.com/Elev8wDavid",
+  icon: "x"
+},
+{
   label: "Email",
   href: "mailto:steban@univercityaiconsult.tech",
   icon: "mail"
@@ -62,6 +67,11 @@ function Icon({ name }) {
     <svg {...common}>
       <rect x="3" y="5" width="18" height="14" rx="2" />
       <path d="M3 7l9 6 9-6" />
+    </svg>);
+
+  if (name === "x") return (
+    <svg {...common} fill="currentColor" stroke="none">
+      <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
     </svg>);
 
   return null;

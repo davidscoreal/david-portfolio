@@ -21,6 +21,11 @@
       icon: "wa"
     },
     {
+      label: "X",
+      href: "https://x.com/Elev8wDavid",
+      icon: "x"
+    },
+    {
       label: "Email",
       href: "mailto:steban@univercityaiconsult.tech",
       icon: "mail"
@@ -33,6 +38,7 @@
     if (name === "li") return /* @__PURE__ */ React.createElement("svg", { ...common }, /* @__PURE__ */ React.createElement("rect", { x: "3", y: "3", width: "18", height: "18", rx: "2" }), /* @__PURE__ */ React.createElement("line", { x1: "7", y1: "10", x2: "7", y2: "17" }), /* @__PURE__ */ React.createElement("circle", { cx: "7", cy: "7", r: "0.6", fill: "currentColor" }), /* @__PURE__ */ React.createElement("path", { d: "M11 17v-7M11 13c0-2 1.5-3 3-3s2.5 1 2.5 3v4" }));
     if (name === "wa") return /* @__PURE__ */ React.createElement("svg", { ...common }, /* @__PURE__ */ React.createElement("path", { d: "M3 21l1.6-4.6A8 8 0 1 1 8 19.4L3 21z" }), /* @__PURE__ */ React.createElement("path", { d: "M9 9.5c0 4 3 6.5 6 6.5l1-1.5-2-1-1 1c-1 0-2.5-1.5-2.5-2.5l1-1-1-2L9.5 9c-.3 0-.5.2-.5.5z", fill: "currentColor", stroke: "none" }));
     if (name === "mail") return /* @__PURE__ */ React.createElement("svg", { ...common }, /* @__PURE__ */ React.createElement("rect", { x: "3", y: "5", width: "18", height: "14", rx: "2" }), /* @__PURE__ */ React.createElement("path", { d: "M3 7l9 6 9-6" }));
+    if (name === "x") return /* @__PURE__ */ React.createElement("svg", { ...common, fill: "currentColor", stroke: "none" }, /* @__PURE__ */ React.createElement("path", { d: "M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" }));
     return null;
   }
   const MISSION_IMAGES = [

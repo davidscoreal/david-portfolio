@@ -167,9 +167,9 @@ a { color: inherit; text-decoration: none; }
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 56px;
-  height: 56px;
-  flex: 0 0 56px;
+  width: 48px;
+  height: 48px;
+  flex: 0 0 48px;
   border-radius: 50%;
   background: var(--surface);
   border: 1px solid var(--border);
@@ -662,7 +662,7 @@ a { color: inherit; text-decoration: none; }
 /* ===== Desktop polish ===== */
 @media (min-width: 600px) {
   .lt-shell { gap: 48px; }
-  .lt-icon-btn { width: 60px; height: 60px; flex-basis: 60px; }
+  .lt-icon-btn { width: 56px; height: 56px; flex-basis: 56px; }
 }
 
 /* ===== Desktop block — portfolio is mobile/tablet only =====
